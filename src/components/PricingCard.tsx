@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./Buttons";
 import { Clock } from "lucide-react";
-import { cn } from "../app/utils/cn";
 
 interface PricingCardProps {
   title: string;
@@ -17,17 +16,13 @@ export function PricingCard({
   price,
   features,
   popular,
-  classname,
 }: PricingCardProps) {
   return (
     <div
       className={
-        (cn(
           `flex flex-col justify-between bg-white rounded-lg shadow-md p-8 ${
             popular ? "ring-2 ring-blue-600" : ""
           }`
-        ),
-        classname)
       }
     >
       {popular && (

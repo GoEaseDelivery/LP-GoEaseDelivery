@@ -1,13 +1,40 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { AuthLayout } from '../components/AuthLayout';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '../components/Buttons';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthLayout } from "../components/AuthLayout";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "../components/Buttons";
+import { useAuthStore } from "../store/auth";
+import { useForm } from "react-hook-form";
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
 export function Login() {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement login logic
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+
+  const [error, setError] = React.useState("");
+
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // TODO: Implement login logic
+  // };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginForm>();
+
+  const onSubmit = async (data: LoginForm) => {
+    const success = await login(data.email, data.password);
+    if (success) {
+      navigate("/dashboard");
+    } else {
+      setError("Credenciais inválidas");
+    }
   };
 
   return (
@@ -20,7 +47,7 @@ export function Login() {
         Voltar para a página inicial
       </Link>
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label
             htmlFor="email"
@@ -30,9 +57,10 @@ export function Login() {
           </label>
           <input
             id="email"
-            name="email"
             type="email"
             required
+            {...register("email", { required: "E-mail é obrigatório" })}
+            // error={errors.email?.message}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
           />
         </div>
@@ -46,26 +74,18 @@ export function Login() {
           </label>
           <input
             id="password"
-            name="password"
             type="password"
-            required
+            {...register("password", { required: "Senha é obrigatória" })}
+            // error={errors.password?.message}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
           />
         </div>
 
-        {/* <button
-          type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-        >
-          Entrar
-        </button> */}
-        <Button className='flex justify-center'>
-        <Link
-          to="/register"
-        >
-          Entrar
-        </Link>
-        </Button>
+        <div className="flex justify-center">
+          <Button className=" w-full" type="submit">
+            Entrar
+          </Button>
+        </div>
 
         <div className="text-sm text-center">
           <Link
