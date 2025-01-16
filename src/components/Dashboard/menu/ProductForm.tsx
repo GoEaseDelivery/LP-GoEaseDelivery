@@ -5,6 +5,8 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Checkbox } from '../ui/Checkbox';
 import { Button } from '../ui/Button';
+import { InputCurrency } from '../../InputCurrency';
+import CurrencyInput from 'react-currency-input-field';
 
 
 interface ProductFormData {
@@ -40,6 +42,8 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
 
   const availability = watch('availability');
   const [previewImage, setPreviewImage] = React.useState(initialData?.image || '');
+
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,13 +82,13 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
 
       <Input
         label="Nome do Produto"
-        {...register('name', { required: 'Nome é obrigatório' })}
+        {...register("name", { required: "Nome é obrigatório" })}
         error={errors.name?.message}
       />
 
       <Select
         label="Categoria"
-        {...register('category', { required: 'Categoria é obrigatória' })}
+        {...register("category", { required: "Categoria é obrigatória" })}
         error={errors.category?.message}
       >
         <option value="">Selecione uma categoria</option>
@@ -98,50 +102,48 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
       <Input
         label="Preço"
         type="text"
-        {...register('price', {
-          required: 'Preço é obrigatório',
+        {...register("price", {
+          required: "Preço é obrigatório",
           pattern: {
             value: /^\d+(\,\d{0,2})?$/,
-            message: 'Formato inválido. Use vírgula para decimais'
-          }
+            message: "Formato inválido. Use vírgula para decimais",
+          },
         })}
         error={errors.price?.message}
         onChange={(e) => {
-          const value = e.target.value.replace(/[^\d,]/g, '');
+          const value = e.target.value.replace(/[^\d,]/g, "");
           e.target.value = value;
         }}
       />
-
-      <Checkbox
-        label="Produto Disponível"
-        {...register('available')}
+      <CurrencyInput
+      placeholder='R$'
+        prefix="R$"
+        decimalsLimit={2}
+        decimalSeparator=","
+        groupSeparator="."
+        {...register("price")}
+        // onValueChange={(value) => setValue("discount", Number(value))}
+        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      <Select
-        label="Disponibilidade"
-        {...register('availability')}
-      >
+      <Checkbox label="Produto Disponível" {...register("available")} />
+
+      <Select label="Disponibilidade" {...register("availability")}>
         <option value="always">Sempre disponível</option>
         <option value="weekdays">Segunda a Sexta</option>
         <option value="weekends">Finais de Semana</option>
         <option value="custom">Personalizado</option>
       </Select>
 
-      {availability === 'custom' && (
-        <Input
-          type="date"
-          label="Disponível até"
-          {...register('validUntil')}
-        />
+      {availability === "custom" && (
+        <Input type="date" label="Disponível até" {...register("validUntil")} />
       )}
 
       <div className="flex justify-end gap-3">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit">
-          Salvar
-        </Button>
+        <Button type="submit">Salvar</Button>
       </div>
     </form>
   );

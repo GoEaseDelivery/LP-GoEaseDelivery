@@ -14,6 +14,7 @@ import { useAuthStore } from "./store/auth";
 import { Dashboard } from './pages/Dashboard';
 import { Coupons } from './pages/Coupons';
 import { Menu } from './pages/Menu';
+import { Categories } from './pages/Categories';
 
 interface PrivateRouteProps {
   isPrivate: boolean;
@@ -46,7 +47,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/cupons" element={<Coupons />} />
             <Route path="/cardapio" element={<Menu />} />
-            <Route path="/categorias" element={<Register />} />
+            <Route path="/categorias" element={<Categories />} />
           </Route>
         </Route>
 

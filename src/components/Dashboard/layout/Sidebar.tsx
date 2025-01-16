@@ -6,18 +6,18 @@ import {
   FileText, 
   Ticket, 
   UtensilsCrossed,
-  HelpCircle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Tag
 } from 'lucide-react';
 import { cn } from '../../../app/utils/cn';
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  { icon: FileText, label: 'Relatório', path: '/relatorio' },
-  { icon: Ticket, label: 'Cupons', path: '/cupons' },
-  { icon: UtensilsCrossed, label: 'Cardápio', path: '/cardapio' },
-  { icon: HelpCircle, label: 'Suporte', path: '/suporte' },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: FileText, label: "Relatório", path: "/relatorio" },
+  { icon: Ticket, label: "Cupons", path: "/cupons" },
+  { icon: UtensilsCrossed, label: "Cardápio", path: "/cardapio" },
+  { icon: Tag, label: "Categorias", path: "/categorias" },
 ];
 
 export function Sidebar() {
@@ -25,17 +25,26 @@ export function Sidebar() {
   const location = useLocation();
 
   return (
-    <div 
+    <div
       className={cn(
-        'bg-white border-r border-gray-200 h-screen transition-all duration-300',
-        collapsed ? 'w-20' : 'w-64'
+        "bg-white border-r border-gray-200 h-screen transition-all duration-150",
+        collapsed ? "w-20" : "w-64"
       )}
     >
       <div className="p-4 flex items-center justify-between border-b">
-        <div className={cn('flex items-center gap-3', collapsed && 'justify-center')}>
-          <ChefHat className="h-8 w-8 text-blue-600" />
-          {!collapsed && <span className="font-semibold text-lg">Pizzaria Luigi's</span>}
-        </div>a
+        <div
+          className={cn(
+            "flex items-center gap-3",
+            collapsed && "justify-center"
+          )}
+        >
+          <ChefHat className="h-8 w-8 text-blue-600  block" />
+          {!collapsed && (
+            <span className={`font-semibold text-lg  `}>
+              Pizzaria Luigi's
+            </span>
+          )}
+        </div>
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-2 hover:bg-gray-100 rounded-lg"
@@ -55,10 +64,10 @@ export function Sidebar() {
                 <Link
                   to={item.path}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
-                    'hover:bg-gray-100',
-                    isActive && 'bg-blue-50 text-blue-600',
-                    collapsed && 'justify-center'
+                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+                    "hover:bg-gray-100",
+                    isActive && "bg-blue-50 text-blue-600",
+                    collapsed && "justify-center"
                   )}
                 >
                   <Icon size={20} />
