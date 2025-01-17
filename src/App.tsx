@@ -6,9 +6,9 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
-import { Home } from "./pages/Home";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
+import { Home } from "./pages/LandingPage/Home";
+import { Login } from "./pages/LandingPage/Login";
+import { Register } from "./pages/LandingPage/Register";
 import { Layout } from "./components/Dashboard/layout/Layout";
 import { useAuthStore } from "./store/auth";
 import { Dashboard } from './pages/Dashboard';

@@ -13,7 +13,6 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     const handleChange = () => {
 
       setChecked(!checked);
-       // Propaga a alteração para os pais, caso necessário
     };
 
     return (

@@ -4,24 +4,12 @@ import { Checkbox } from '../ui/Checkbox';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { cn } from '../../../app/utils/cn';
-
-
-interface CategoryFormData {
-  name: string;
-  isSpecial: boolean;
-  availability: "always" | "weekdays" | "weekends" | "custom";
-  availableDays: string[];
-  isPromotional: boolean;
-  sizes?: string[];
-  crusts?: string[];
-  borders?: string[];
-  extras?: string[];
-}
+import { Category } from '../../../types/Category'
 
 interface CategoryFormProps {
-  onSubmit: (data: CategoryFormData) => void;
+  onSubmit: (data: Category) => void;
   onCancel: () => void;
-  initialData?: Partial<CategoryFormData>;
+  initialData?: Partial<Category>;
 }
 
 const DAYS_OF_WEEK = [
@@ -41,6 +29,13 @@ const PIZZA_OPTIONS = {
   extras: ["Bacon", "Extra Queijo", "Molho Especial"],
 };
 
+const AVAILABILITY_OPTIONS = [
+  { value: "always", label: "Sempre disponível" },
+  { value: "weekdays", label: "Dias úteis" },
+  { value: "weekends", label: "Finais de semana" },
+  { value: "custom", label: "Personalizado" },
+];
+
 export function CategoryForm({
   onSubmit,
   onCancel,
@@ -52,7 +47,7 @@ export function CategoryForm({
     watch,
     setValue,
     formState: { errors },
-  } = useForm<CategoryFormData>({
+  } = useForm<Category>({
     defaultValues: {
       name: "",
       isSpecial: false,
@@ -74,7 +69,6 @@ export function CategoryForm({
       : [...currentDays, day];
     setValue("availableDays", newDays);
   };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <Input
@@ -83,7 +77,7 @@ export function CategoryForm({
         error={errors.name?.message}
       />
 
-      <Checkbox label="Categoria Especial (Pizza)" {...register("isSpecial")} />
+      <Checkbox label="Categoria Especial (Pizza)" checked = {isSpecial} {...register("isSpecial")} />
 
       {isSpecial && (
         <div className="space-y-6 border-l-2 border-blue-200 pl-4">
@@ -98,7 +92,7 @@ export function CategoryForm({
               <div className="flex flex-wrap gap-2">
                 {options.map((option) => {
                   const fieldName = key as keyof Pick<
-                    CategoryFormData,
+                    Category,
                     "sizes" | "crusts" | "borders" | "extras"
                   >;
                   const isSelected = watch(fieldName)?.includes(option);
@@ -133,28 +127,53 @@ export function CategoryForm({
         </div>
       )}
 
-      <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Disponibilidade
-        </label>
-        <div className="flex justify-between gap-2">
-          {DAYS_OF_WEEK.map((day) => (
-            <button
-              key={day.value}
-              type="button"
-              onClick={() => toggleDay(day.value)}
-              className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
-                availableDays.includes(day.value)
-                  ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              )}
-            >
-              {day.label}
-            </button>
-          ))}
-        </div>
+<div className="space-y-4">
+  <label className="block text-sm font-medium text-gray-700">
+    Disponibilidade
+  </label>
+  <div className="flex flex-wrap gap-2">
+    {AVAILABILITY_OPTIONS.map((option) => (
+      <button
+        key={option.value}
+        type="button"
+        onClick={() => setValue("availability", option.value)}
+        className={cn(
+          "px-3 py-1 rounded-full text-sm transition-colors",
+          availability === option.value
+            ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        )}
+      >
+        {option.label}
+      </button>
+    ))}
+  </div>
+
+  {availability === "custom" && (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Dias Personalizados
+      </label>
+      <div className="flex justify-between gap-2">
+        {DAYS_OF_WEEK.map((day) => (
+          <button
+            key={day.value}
+            type="button"
+            onClick={() => toggleDay(day.value)}
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+              availableDays.includes(day.value)
+                ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            )}
+          >
+            {day.label}
+          </button>
+        ))}
       </div>
+    </div>
+  )}
+</div>
 
       <Checkbox label="Categoria em Promoção" {...register("isPromotional")} />
 

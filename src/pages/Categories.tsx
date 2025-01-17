@@ -1,53 +1,86 @@
-import { useState } from 'react';
-import { Plus, ChevronDown } from 'lucide-react';
-import { Button } from '../components/Dashboard/ui/Button';
-import { Card } from '../components/Dashboard/ui/Card';
-import { Dialog } from '../components/Dashboard/ui/Dialog';
-import { CategoryForm } from '../components/Dashboard/categories/CategoryForm';
-import { cn } from '../app/utils/cn';
+import { useState } from "react";
+import { Plus, ChevronDown } from "lucide-react";
+import { Button } from "../components/Dashboard/ui/Button";
+import { Card } from "../components/Dashboard/ui/Card";
+import { Dialog } from "../components/Dashboard/ui/Dialog";
+import { CategoryForm } from "../components/Dashboard/categories/CategoryForm";
+import { cn } from "../app/utils/cn";
+import { Category } from "../types/Category";
 
-const mockCategories = [
+
+
+const mockCategories: Category[] = [
   {
     id: 1,
-    name: 'Pizzas',
+    name: "Pizzas",
     isSpecial: true,
-    sizes: ['Pequena', 'Média', 'Grande', 'Família'],
-    crusts: ['Tradicional', 'Integral', 'Sem Glúten'],
-    borders: ['Catupiry', 'Cheddar', 'Chocolate'],
-    extras: ['Bacon', 'Extra Queijo', 'Molho Especial'],
-    availability: 'always',
+    availability: "always",
+    availableDays: [],
     isPromotional: false,
+    sizes: ["Pequena", "Média", "Grande", "Família"],
+    crusts: ["Tradicional", "Integral", "Sem Glúten"],
+    borders: ["Catupiry", "Cheddar", "Chocolate"],
+    extras: ["Bacon", "Extra Queijo", "Molho Especial"],
   },
   {
     id: 2,
-    name: 'Bebidas',
+    name: "Bebidas",
     isSpecial: false,
-    availability: 'always',
+    availability: "always",
+    availableDays: [],
     isPromotional: true,
   },
   {
     id: 3,
-    name: 'Sobremesas',
+    name: "Sobremesas",
     isSpecial: false,
-    availability: 'weekends',
+    availability: "custom",
+    availableDays: ["tue", "wed"], // Exemplo: Apenas disponível terça e quarta-feira
     isPromotional: false,
   },
 ];
 
 export function Categories() {
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Partial<Category> | null>(null);
 
-  const handleSubmit = (data: any) => {
-    console.log('Form submitted:', data);
+  const DAYS_TRANSLATION: Record<string, string> = {
+    sun: "Dom",
+    mon: "Seg",
+    tue: "Ter",
+    wed: "Quar",
+    thu: "Qui",
+    fri: "Sex",
+    sat: "Sáb",
+  };
+  
+
+  const handleSubmit = (data: Category) => {
+    if (selectedCategory?.id) {
+      // Editar categoria existente
+      setCategories((prev) =>
+        prev.map((cat) => (cat.id === selectedCategory.id ? { ...cat, ...data } : cat))
+      );
+    } else {
+      const newCategory: Category = {
+        ...data,
+        id: categories.length + 1, // Geração simples de ID
+      };
+      setCategories((prev) => [...prev, newCategory]);
+    }
     setIsFormOpen(false);
     setSelectedCategory(null);
   };
 
-  const handleEdit = (category: any) => {
+  const handleEdit = (category: Category) => {
     setSelectedCategory(category);
     setIsFormOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    setCategories((prev) => prev.filter((category) => category.id !== id));
   };
 
   return (
@@ -61,13 +94,13 @@ export function Categories() {
       </div>
 
       <div className="space-y-4">
-        {mockCategories.map((category) => (
+        {categories.map((category) => (
           <Card key={category.id}>
-            <div 
+            <div
               className="flex items-center justify-between cursor-pointer p-4"
-              onClick={() => setExpandedCategory(
-                expandedCategory === category.id ? null : category.id
-              )}
+              onClick={() =>
+                setExpandedCategory(expandedCategory === category.id ? null : category.id)
+              }
             >
               <div className="flex items-center gap-4">
                 <h3 className="font-semibold">{category.name}</h3>
@@ -78,12 +111,19 @@ export function Categories() {
                 )}
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  {category.availability === 'always' 
-                    ? 'Sempre disponível'
-                    : 'Disponível aos finais de semana'
-                  }
-                </span>
+              <span className="text-sm text-gray-600">
+                {category.availability === "always"
+                  ? "Sempre disponível"
+                  : category.availability === "weekdays"
+                  ? "Dias úteis"
+                  : category.availability === "weekends"
+                  ? "Finais de semana"
+                  : category.availability === "custom"
+                  ? category.availableDays
+                      .map((day) => DAYS_TRANSLATION[day] || day)
+                      .join(", ")
+                  : "Não especificado"}
+              </span>
                 <Button
                   variant="outline"
                   size="sm"
@@ -94,12 +134,23 @@ export function Categories() {
                 >
                   Editar
                 </Button>
-                <ChevronDown 
-                  className={cn(
-                    'h-5 w-5 transition-transform',
-                    expandedCategory === category.id && 'transform rotate-180'
-                  )} 
-                />
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(category.id);
+                  }}
+                >
+                  Deletar
+                </Button>
+                {category.isSpecial && (
+                  <ChevronDown
+                    className={cn(
+                      "h-5 w-5 transition-transform",
+                      expandedCategory === category.id && "transform rotate-180"
+                    )}
+                  />
+                )}
               </div>
             </div>
 
@@ -172,7 +223,7 @@ export function Categories() {
           setIsFormOpen(false);
           setSelectedCategory(null);
         }}
-        title={selectedCategory ? 'Editar Categoria' : 'Nova Categoria'}
+        title={selectedCategory ? "Editar Categoria" : "Nova Categoria"}
       >
         <CategoryForm
           onSubmit={handleSubmit}

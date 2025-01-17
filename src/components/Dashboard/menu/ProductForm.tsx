@@ -41,6 +41,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
   });
 
   const availability = watch('availability');
+  const available = watch('available');
   const [previewImage, setPreviewImage] = React.useState(initialData?.image || '');
 
 
@@ -126,7 +127,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
         className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      <Checkbox label="Produto Disponível" {...register("available")} />
+      <Checkbox label="Produto Disponível" checked = {available} {...register("available")} />
 
       <Select label="Disponibilidade" {...register("availability")}>
         <option value="always">Sempre disponível</option>
