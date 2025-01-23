@@ -1,41 +1,28 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthLayout } from "../components/AuthLayout";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "../components/Buttons";
-import { useAuthStore } from "../store/auth";
 import { useForm } from "react-hook-form";
+import { AuthLayout } from '../../components/AuthLayout';
+import { useAuthStore } from '../../store/auth';
+import { Button } from '../../components/Buttons';
+import { Input } from '../../components/Dashboard/ui/Input';
+import { useLoginController } from './useLoginController';
 
-interface LoginForm {
-  email: string;
-  password: string;
-}
+
 
 export function Login() {
-  const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
 
-  const [error, setError] = React.useState("");
+    const { handleSubmit, register, errors, isPending } = useLoginController();
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   // TODO: Implement login logic
+
+  // const onSubmit = async (data: LoginForm) => {
+  //   const success = await login(data.email, data.password);
+  //   if (success) {
+  //     navigate("/dashboard");
+  //   } else {
+  //     setError("Credenciais inválidas");
+  //   }
   // };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginForm>();
-
-  const onSubmit = async (data: LoginForm) => {
-    const success = await login(data.email, data.password);
-    if (success) {
-      navigate("/dashboard");
-    } else {
-      setError("Credenciais inválidas");
-    }
-  };
 
   return (
     <AuthLayout title="Entre na sua conta">
@@ -47,7 +34,7 @@ export function Login() {
         Voltar para a página inicial
       </Link>
 
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
           <label
             htmlFor="email"
@@ -55,12 +42,12 @@ export function Login() {
           >
             Email
           </label>
-          <input
+          <Input
             id="email"
-            type="email"
+            // type="email"
             required
-            {...register("email", { required: "E-mail é obrigatório" })}
-            // error={errors.email?.message}
+            {...register("username", { required: "E-mail é obrigatório" })}
+            error={errors.username?.message}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
           />
         </div>
@@ -72,17 +59,17 @@ export function Login() {
           >
             Senha
           </label>
-          <input
+          <Input
             id="password"
             type="password"
             {...register("password", { required: "Senha é obrigatória" })}
-            // error={errors.password?.message}
+            error={errors.password?.message}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
           />
         </div>
 
         <div className="flex justify-center">
-          <Button className=" w-full" type="submit">
+          <Button className=" w-full" type="submit" isLoading={isPending}>
             Entrar
           </Button>
         </div>

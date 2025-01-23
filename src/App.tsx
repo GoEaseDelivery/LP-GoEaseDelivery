@@ -1,61 +1,27 @@
-import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-} from "react-router-dom";
-import { Home } from "./pages/Home";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
-import { Layout } from "./components/Dashboard/layout/Layout";
-import { useAuthStore } from "./store/auth";
-import { Dashboard } from './pages/Dashboard';
-import { Coupons } from './pages/Coupons';
-import { Menu } from './pages/Menu';
-import { Categories } from './pages/Categories';
+import { AuthProvider } from "./app/contexts/AuthContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Router } from "./Router";
+import { Toaster } from 'react-hot-toast';
 
-interface PrivateRouteProps {
-  isPrivate: boolean;
-}
-
-function PrivateRoute({ isPrivate }: PrivateRouteProps) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (!isAuthenticated && isPrivate) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (isAuthenticated && !isPrivate) {
-    return <Navigate to="/" replace />;
-  }
-  return <Outlet />;
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<PrivateRoute isPrivate={false} />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
-        <Route element={<PrivateRoute isPrivate={true} />}>
-          <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/cupons" element={<Coupons />} />
-            <Route path="/cardapio" element={<Menu />} />
-            <Route path="/categorias" element={<Categories />} />
-          </Route>
-        </Route>
-
-        {/* <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} /> */}
-      </Routes>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
+      <ReactQueryDevtools position="top" />
+    </QueryClientProvider>
   );
 }
 
